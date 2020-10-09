@@ -15,6 +15,7 @@ class ToDoApp extends React.Component {
         this.addItem = this.addItem.bind(this);
         this.changeActive = this.changeActive.bind(this);
         this.removeItem = this.removeItem.bind(this);
+        this.removeNotActiveItems = this.removeNotActiveItems.bind(this);
         this.removeAllItems = this.removeAllItems.bind(this);
     }
 
@@ -47,7 +48,7 @@ class ToDoApp extends React.Component {
     }
 
     changeActive(id) {
-        let newActiveList = this.state.itemList.map(
+        let newActiveList = this.state.activeList.map(
             (i, key) => (this.state.itemList[key].props.id === id ? !i : i)
         );
         this.setState({ activeList: newActiveList });
@@ -56,6 +57,18 @@ class ToDoApp extends React.Component {
     removeItem(id) {
         let newItemList = this.state.itemList.filter(i => i.props.id != id);
         let newActiveList = this.state.itemList.filter((i, key) => this.state.itemList[key].props.id != id);
+
+        this.setState(
+            {
+                itemList: newItemList,
+                activeList: newActiveList
+            }
+        );
+    }
+
+    removeNotActiveItems() {
+        let newItemList = this.state.itemList.filter((i, key) => this.state.activeList[key]);
+        let newActiveList = this.state.activeList.filter(i => i);
 
         this.setState(
             {
@@ -106,7 +119,13 @@ class ToDoApp extends React.Component {
                         </ul>
 
                         {/* ----- REMOVE ALL BUTTON ----- */}
-                        {this.state.itemList.length > 0 ? <RemoveAll remover={this.removeAllItems} /> : null}
+                        {this.state.itemList.length > 0
+                            ? <RemoveButtons
+                                notActiveRemover={this.removeNotActiveItems}
+                                allItemsRemover={this.removeAllItems}
+                            />
+                            : null
+                        }
 
                     </div>
                 </div>
@@ -281,13 +300,20 @@ class ListItem extends React.Component {
 
 
 // ----- REMOVE ALL COMPONENT -----
-const RemoveAll = (props) => {
+const RemoveButtons = (props) => {
     return (
         <div className="text-center">
             <button
                 type="button"
-                className="btn btn-sm btn-outline-danger mt-3"
-                onClick={props.remover}>
+                className="btn btn-sm btn-outline-secondary mt-3 mx-2"
+                onClick={props.notActiveRemover}>
+                Remove completed
+            </button>
+
+            <button
+                type="button"
+                className="btn btn-sm btn-outline-danger mt-3 mx-2"
+                onClick={props.allItemsRemover}>
                 Clear list
             </button>
         </div>
