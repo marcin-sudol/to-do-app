@@ -4,14 +4,16 @@ class ToDoApp extends React.Component {
     constructor(props) {
         super(props);
 
-        // ----- STATE
+        // ----- STATE -----
         this.state = {
             itemList: [],
+            activeList: [],
             nextKey: 0
         };
 
         // ----- BINDING METHODS -----
         this.addItem = this.addItem.bind(this);
+        this.changeActive = this.changeActive.bind(this);
         this.removeItem = this.removeItem.bind(this);
         this.removeAllItems = this.removeAllItems.bind(this);
     }
@@ -20,31 +22,56 @@ class ToDoApp extends React.Component {
     addItem(item) {
         if (item != "") {
             let newItemList = this.state.itemList.slice();
+            let newActiveList = this.state.activeList.slice();
 
             newItemList.push(
                 <ListItem
                     key={this.state.nextKey}
                     id={this.state.nextKey}
                     item={item}
+                    activityChanger={this.changeActive}
                     remover={this.removeItem}
                 />
             );
 
-            this.setState((state) => ({
-                itemList: newItemList,
-                nextKey: state.nextKey + 1
-            }));
+            newActiveList.push(true);
+
+            this.setState(
+                (state) => ({
+                    itemList: newItemList,
+                    activeList: newActiveList,
+                    nextKey: state.nextKey + 1
+                })
+            );
         }
+    }
+
+    changeActive(id) {
+        let newActiveList = this.state.itemList.map(
+            (i, key) => (this.state.itemList[key].props.id === id ? !i : i)
+        );
+        this.setState({ activeList: newActiveList });
     }
 
     removeItem(id) {
         let newItemList = this.state.itemList.filter(i => i.props.id != id);
+        let newActiveList = this.state.itemList.filter((i, key) => this.state.itemList[key].props.id != id);
 
-        this.setState({ itemList: newItemList });
+        this.setState(
+            {
+                itemList: newItemList,
+                activeList: newActiveList
+            }
+        );
     }
 
     removeAllItems() {
-        this.setState({ itemList: [] });
+        this.setState(
+            {
+                itemList: [],
+                activeList: []
+            }
+        );
     }
 
     // ----- RENDER -----
@@ -197,6 +224,7 @@ class ListItem extends React.Component {
     static propTypes = {
         id: PropTypes.number,
         item: PropTypes.string,
+        activityChanger: PropTypes.func,
         remover: PropTypes.func
     }
 
@@ -205,6 +233,7 @@ class ListItem extends React.Component {
         this.setState(
             (state) => ({ active: !state.active })
         );
+        this.props.activityChanger(this.props.id);
     }
 
     remove() {
