@@ -17,6 +17,8 @@ class ToDoApp extends React.Component {
         this.removeItem = this.removeItem.bind(this);
         this.removeNotActiveItems = this.removeNotActiveItems.bind(this);
         this.removeAllItems = this.removeAllItems.bind(this);
+
+        this.textInput = <TextInput adder={this.addItem} />;
     }
 
     // ----- METHODS -----
@@ -106,7 +108,7 @@ class ToDoApp extends React.Component {
                         </h3>
 
                         {/* ----- TEXT INPUT ----- */}
-                        <TextInput adder={this.addItem} />
+                        {this.textInput}
 
                         {this.state.itemList.length > 0
                             ? <hr />
