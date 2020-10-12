@@ -6,87 +6,59 @@ class ToDoApp extends React.Component {
 
         // ----- STATE -----
         this.state = {
-            itemList: [],
-            activeList: [],
-            nextKey: 0
+            items: [],
+            nextId: 0
         };
 
         // ----- BINDING METHODS -----
         this.addItem = this.addItem.bind(this);
-        this.changeActive = this.changeActive.bind(this);
+        this.changeItemCompletion = this.changeItemCompletion.bind(this);
         this.removeItem = this.removeItem.bind(this);
-        this.removeNotActiveItems = this.removeNotActiveItems.bind(this);
+        this.removeCompletedItems = this.removeCompletedItems.bind(this);
         this.removeAllItems = this.removeAllItems.bind(this);
-
-        this.textInput = <TextInput adder={this.addItem} />;
     }
 
     // ----- METHODS -----
-    addItem(item) {
-        if (item != "") {
-            let newItemList = this.state.itemList.slice();
-            let newActiveList = this.state.activeList.slice();
+    addItem(text) {
+        if (text != "") {
+            let newItems = this.state.items.slice();
 
-            newItemList.push(
-                <ListItem
-                    key={this.state.nextKey}
-                    id={this.state.nextKey}
-                    item={item}
-                    activityChanger={this.changeActive}
-                    remover={this.removeItem}
-                />
+            newItems.push(
+                {
+                    id: this.state.nextId,
+                    text,
+                    completed: false
+                }
             );
-
-            newActiveList.push(true);
 
             this.setState(
                 (state) => ({
-                    itemList: newItemList,
-                    activeList: newActiveList,
-                    nextKey: state.nextKey + 1
+                    items: newItems,
+                    nextId: state.nextId + 1
                 })
             );
         }
     }
 
-    changeActive(id) {
-        let newActiveList = this.state.activeList.map(
-            (i, key) => (this.state.itemList[key].props.id === id ? !i : i)
+    changeItemCompletion(id) {
+        let newItems = this.state.items.map(
+            (item) => (item.id === id ? Object.assign({}, item, { completed: !item.completed }) : item)
         );
-        this.setState({ activeList: newActiveList });
+        this.setState({ items: newItems });
     }
 
     removeItem(id) {
-        let newItemList = this.state.itemList.filter(i => i.props.id != id);
-        let newActiveList = this.state.itemList.filter((i, key) => this.state.itemList[key].props.id != id);
-
-        this.setState(
-            {
-                itemList: newItemList,
-                activeList: newActiveList
-            }
-        );
+        let newItems = this.state.items.filter(item => item.id != id);
+        this.setState({ items: newItems });
     }
 
-    removeNotActiveItems() {
-        let newItemList = this.state.itemList.filter((i, key) => this.state.activeList[key]);
-        let newActiveList = this.state.activeList.filter(i => i);
-
-        this.setState(
-            {
-                itemList: newItemList,
-                activeList: newActiveList
-            }
-        );
+    removeCompletedItems() {
+        let newItems = this.state.items.filter(item => !item.completed);
+        this.setState({ items: newItems });
     }
 
     removeAllItems() {
-        this.setState(
-            {
-                itemList: [],
-                activeList: []
-            }
-        );
+        this.setState({ items: [] });
     }
 
     // ----- RENDER -----
@@ -108,27 +80,44 @@ class ToDoApp extends React.Component {
                         </h3>
 
                         {/* ----- TEXT INPUT ----- */}
-                        {this.textInput}
+                        <TextInput onSubmit={this.addItem} />
 
-                        {this.state.itemList.length > 0
+                        {this.state.items.length > 0
                             ? <hr />
                             : <p className="text-center text-secondary">Your list is empty!</p>
                         }
 
                         {/* ----- ITEM LIST ----- */}
                         <ul className="list-group">
-                            {this.state.itemList}
+                            {this.state.items.map(item =>
+                                (<Item
+                                    key={item.id}
+                                    {...item}
+                                    onChange={this.changeItemCompletion}
+                                    onClose={this.removeItem}
+                                />)
+                            )}
                         </ul>
 
                         {/* ----- REMOVE ALL BUTTON ----- */}
-                        {this.state.itemList.length > 0
-                            ? <RemoveButtons
-                                notActiveRemover={this.removeNotActiveItems}
-                                allItemsRemover={this.removeAllItems}
-                            />
+                        {this.state.items.length > 0
+                            ? (<div className="text-center">
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-secondary mt-3 mx-2"
+                                    onClick={this.removeCompletedItems}>
+                                    Remove completed
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-danger mt-3 mx-2"
+                                    onClick={this.removeAllItems}>
+                                    Clear list
+                                </button>
+                            </div>)
                             : null
                         }
-
                     </div>
                 </div>
             </div>
@@ -158,7 +147,7 @@ class TextInput extends React.Component {
 
     // ----- PROP TYPES -----
     static propTypes = {
-        adder: PropTypes.func
+        onSubmit: PropTypes.func
     }
 
     // ----- METHODS -----
@@ -168,7 +157,7 @@ class TextInput extends React.Component {
 
     sendInput() {
         if (this.state.input != "") {
-            this.props.adder(this.state.input);
+            this.props.onSubmit(this.state.input);
             this.setState({ input: "" });
         }
     }
@@ -193,7 +182,6 @@ class TextInput extends React.Component {
     // ----- RENDER -----
     render() {
         return (
-
             <form className="form-group">
                 <div className="input-group">
                     <input
@@ -227,58 +215,50 @@ class TextInput extends React.Component {
 
 
 // ----- LIST ITEM COMPONENT -----
-class ListItem extends React.Component {
+class Item extends React.Component {
     constructor(props) {
         super(props);
 
-        // ----- STATE -----
-        this.state = {
-            active: true
-        };
-
         // ----- BINDING METHODS -----
-        this.changeActive = this.changeActive.bind(this);
+        this.changeCompletion = this.changeCompletion.bind(this);
         this.remove = this.remove.bind(this);
     }
 
     // ----- PROP TYPES -----
     static propTypes = {
         id: PropTypes.number,
-        item: PropTypes.string,
-        activityChanger: PropTypes.func,
-        remover: PropTypes.func
+        text: PropTypes.string,
+        completed: PropTypes.bool,
+        onChange: PropTypes.func,
+        onClose: PropTypes.func
     }
 
     // ----- METHODS -----
-    changeActive() {
-        this.setState(
-            (state) => ({ active: !state.active })
-        );
-        this.props.activityChanger(this.props.id);
+    changeCompletion() {
+        this.props.onChange(this.props.id);
     }
 
     remove() {
-        this.props.remover(this.props.id);
+        this.props.onClose(this.props.id);
     }
 
     // ----- RENDER -----
     render() {
         const itemId = 'item' + this.props.id;
-        const htmlItem =
-            this.state.active ? this.props.item : (<del>{this.props.item}</del>);
+        const htmlItem = this.props.completed ? (<del>{this.props.text}</del>) : this.props.text;
 
         return (
-            <li className={"list-group-item " + (!this.state.active ? "bg-light" : null)}>
+            <li className={"list-group-item " + (this.props.completed ? "bg-light" : null)}>
                 <div className="custom-control custom-checkbox">
                     <input
                         type="checkbox"
                         className="custom-control-input"
                         id={itemId}
-                        checked={!this.state.active}
-                        onChange={this.changeActive}
+                        checked={this.props.completed}
+                        onChange={this.changeCompletion}
                     />
                     <label
-                        className={"custom-control-label" + (this.state.active ? "" : " text-secondary")}
+                        className={"custom-control-label" + (this.props.completed ? " text-secondary" : "")}
                         htmlFor={itemId}
                     >
                         {htmlItem}
@@ -295,31 +275,6 @@ class ListItem extends React.Component {
             </li>
         );
     }
-};
-
-
-
-
-
-// ----- REMOVE ALL COMPONENT -----
-const RemoveButtons = (props) => {
-    return (
-        <div className="text-center">
-            <button
-                type="button"
-                className="btn btn-sm btn-outline-secondary mt-3 mx-2"
-                onClick={props.notActiveRemover}>
-                Remove completed
-            </button>
-
-            <button
-                type="button"
-                className="btn btn-sm btn-outline-danger mt-3 mx-2"
-                onClick={props.allItemsRemover}>
-                Clear list
-            </button>
-        </div>
-    )
 };
 
 
