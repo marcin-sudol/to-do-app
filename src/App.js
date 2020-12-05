@@ -10,6 +10,8 @@ export default class App extends React.Component {
       nextId: 0,
     };
 
+    this.storage = window.localStorage;
+
     this.addItem = this.addItem.bind(this);
     this.changeItemCompletion = this.changeItemCompletion.bind(this);
     this.removeItem = this.removeItem.bind(this);
@@ -54,7 +56,18 @@ export default class App extends React.Component {
   }
 
   removeAllItems() {
-    this.setState({ items: [] });
+    this.setState({ items: [], nextId: 0 });
+  }
+
+  componentDidMount() {
+    const state = this.storage.getItem("toDoList");
+    if (state !== undefined) {
+      this.setState(JSON.parse(state));
+    }
+  }
+
+  componentDidUpdate() {
+    this.storage.setItem("toDoList", JSON.stringify(this.state));
   }
 
   render() {
