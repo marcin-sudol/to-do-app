@@ -2,12 +2,10 @@ export default class Item extends React.Component {
   constructor(props) {
     super(props);
 
-    // ----- BINDING METHODS -----
     this.changeCompletion = this.changeCompletion.bind(this);
     this.remove = this.remove.bind(this);
   }
 
-  // ----- PROP TYPES -----
   static propTypes = {
     id: PropTypes.number,
     text: PropTypes.string,
@@ -16,7 +14,6 @@ export default class Item extends React.Component {
     onClose: PropTypes.func,
   };
 
-  // ----- METHODS -----
   changeCompletion() {
     this.props.onChange(this.props.id);
   }
@@ -25,7 +22,6 @@ export default class Item extends React.Component {
     this.props.onClose(this.props.id);
   }
 
-  // ----- RENDER -----
   render() {
     const itemId = "item" + this.props.id;
     const htmlItem = this.props.completed ? (

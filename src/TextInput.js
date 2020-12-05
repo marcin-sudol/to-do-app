@@ -2,23 +2,19 @@ export default class TextInput extends React.Component {
   constructor(props) {
     super(props);
 
-    // ----- STATE
     this.state = {
       input: "",
     };
 
-    // ----- BINDING METHODS -----
     this.changeInput = this.changeInput.bind(this);
     this.sendInput = this.sendInput.bind(this);
     this.inputKeyPressed = this.inputKeyPressed.bind(this);
   }
 
-  // ----- PROP TYPES -----
   static propTypes = {
     onSubmit: PropTypes.func,
   };
 
-  // ----- METHODS -----
   changeInput(event) {
     this.setState({ input: event.target.value });
   }
@@ -49,7 +45,6 @@ export default class TextInput extends React.Component {
       .removeEventListener("keydown", this.inputKeyPressed);
   }
 
-  // ----- RENDER -----
   render() {
     return (
       <form className="form-group">

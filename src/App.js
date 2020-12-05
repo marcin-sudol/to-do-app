@@ -1,17 +1,15 @@
-import Item from "./Item";
-import TextInput from "./TextInput";
+import Item from "./Item.js";
+import TextInput from "./TextInput.js";
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
 
-    // ----- STATE -----
     this.state = {
       items: [],
       nextId: 0,
     };
 
-    // ----- BINDING METHODS -----
     this.addItem = this.addItem.bind(this);
     this.changeItemCompletion = this.changeItemCompletion.bind(this);
     this.removeItem = this.removeItem.bind(this);
@@ -19,7 +17,6 @@ export default class App extends React.Component {
     this.removeAllItems = this.removeAllItems.bind(this);
   }
 
-  // ----- METHODS -----
   addItem(text) {
     if (text != "") {
       let newItems = this.state.items.slice();
@@ -60,7 +57,6 @@ export default class App extends React.Component {
     this.setState({ items: [] });
   }
 
-  // ----- RENDER -----
   render() {
     return (
       <div className="container-fluid p-3">
