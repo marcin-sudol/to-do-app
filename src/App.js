@@ -1,5 +1,5 @@
-import Item from "./Item.js";
-import TextInput from "./TextInput.js";
+import Item from "./item.js";
+import TextInput from "./text-input.js";
 
 export default class App extends React.Component {
   constructor(props) {
