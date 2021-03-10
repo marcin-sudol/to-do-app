@@ -1,7 +1,8 @@
-# Simple To Do List written with React class components
+# To Do List
 
-Some features:
+_Simple app created to practice React_
 
-- toggling item complete
-- removing all items or completed items
+- written with React class components
 - styled with Bootstrap
+- user can toggle item's completion
+- user can remove completed items or all items from the list
