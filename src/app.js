@@ -1,4 +1,4 @@
-import Item from "./temp-item.js";
+import Item from "./item.js";
 import TextInput from "./text-input.js";
 
 export default class App extends React.Component {
